@@ -7,45 +7,31 @@ using System.Threading.Tasks;
 
 namespace ListTask
 {
-    public class List : IEnumerable
+    public class List<T> : IEnumerable
     {
         private int capacity;
         private int size;
-        private int[] array;
+        private T[] array;
 
         public List() 
         {
             size = 0;
             capacity = 1;
-            array = new int[1];
+            array = new T[1];
         }
         public List(int lenght)
         {
             size = 0;
             capacity = lenght;
-            array = new int[lenght];
+            array = new T[lenght];
         }
-        public void Add(int item)
+        public void Add(T item)
         {
-
-            if (size < capacity)
+            if (size >= capacity)
             {
-                array[size] = item;
-                size++;
+                Array.Resize(ref array, capacity*2)
             }
-            else if (size >= capacity)
-            {
-                capacity *= 2;
-                int[] newarray = new int[capacity];
-                for (int i = 0; i < size; i++)
-                {
-                    newarray[i] = array[i];
-
-                }
-                newarray[size] = item;
-                size++;
-                array = newarray;
-            }
+            array[size++] = item;
         }
 
         public void Foreach(Action<int> action)
@@ -59,7 +45,7 @@ namespace ListTask
 
         public int Count { get { return size; } }
 
-        public int FindIndex(int item)
+        public int FindIndex(T item)
         {
             for (int i = 0; i < size; i++)
             {
@@ -71,47 +57,25 @@ namespace ListTask
             return -1;
         }
 
-        public int Find(int val)//Predicate<int> predicate
+        public T Find(int index) //???
         {
-            for (int i = 0; i < size; i++)
-            {
-                if(array[i] == val)
-                    return i;
-                // if (predicate(array[i]))
-                // {
-                //     return array[i];
-                // }
-            }
-
-            return default(int);
+            return array[index];
         }
 
-        public void Insert(int index, int item)
+        public void Insert(int index, T item)
         {
-            if (size<capacity)
+            if (index<capacity)
             {
-                for (int i = size; i >index; i--)
+                for (int i = copacity-1; i > indx; i--)
                 {
-                    array[i] = array[i - 1];
+                    array[i] = array[i-1];
                 }
-                array[index] = item;
             }
-            else if (size==capacity)
+            else
             {
-                capacity *= 2;
-                int[] newarray = new int[capacity];
-                newarray[index] = item;
-                for (int i = 0; i < index; i++)
-                {
-                    newarray[i] = array[i];
-                }
-                for (int i = index; i < size; i++)
-                {
-                    newarray[i + 1] = array[i];
-                }
-                array = newarray;
-                ++size;
+                Array.Resize(ref array, copacity*2);
             }
+            array[index] = item;
 
         }
 
