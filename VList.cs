@@ -22,7 +22,7 @@ namespace ListTask
         public List(int lenght)
         {
             size = 0;
-            capacity = 1;
+            capacity = lenght;
             array = new int[lenght];
         }
         public void Add(int item)
