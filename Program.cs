@@ -1,141 +1,327 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sem2
+namespace listlink
 {
     internal class Program
     {
-        static int count_plus, count_fill, count_space;
         static void Main(string[] args)
         {
-            int n, m, r, x, y;
-            char z;
-            char[] massive;
-            while (true)
+            MyList<char> lst = new MyList<char>(); // ваш список
+            Console.WriteLine(lst.Count + " " + lst.IsEmpty());
+            for (int i = 0; i < 5; i++)
+                lst.PushBack((char)(i + 97));
+            print_lst(lst);
+            for (int i = 0; i < 5; i++)
+                lst.Insert(0, (char)(122 - i));
+            print_lst(lst);
+            for (int i = 0; i < lst.Count; i++)
+                lst[i] = (char)(i + 97); // методы доступа set
+            print_lst(lst);
+            lst.PopBack();
+            lst.PopFront();
+            print_lst(lst);
+            lst.RemoveAt(5);
+            lst.Insert(3, 'o');
+            print_lst(lst);
+            lst.Clear();
+            lst.PushBack('q');
+            lst.PushFront('a');
+            lst.PushBack('w');
+            Console.WriteLine(lst.First() + " " + lst.Last());
+            Console.WriteLine(lst.Count + " " + lst.IsEmpty());
+        }
+        static void print_lst(MyList<char> lst)
+        {
+            for (int i = 0; i < lst.Count; i++)
             {
-                try
+                Console.Write(lst[i]);
+            }
+            Console.WriteLine();
+        }
+    }
+    public class Node<T> 
+    {
+        T data;
+        Node<T> next;
+
+        public Node(T val)
+        {
+            data = val;
+        }
+        public Node() { }
+        public T Data { get { return data; } set { data = value; } }
+        public Node<T> Next { get { return next; } set { next = value; } }
+    }
+
+    public class MyList<T> : IEnumerable<T>, ISLList<T>
+    {
+        Node<T> head;
+        int count;
+        public MyList()
+        {
+            head = new Node<T>
+            {
+                Next = null
+            };
+            count = 0;
+        }
+        public void PushBack(T data)
+        {
+            Node<T> node = new Node<T>(data);
+
+            if (head.Next == null)
+            {
+                head.Next = node;
+            }
+            else
+            {
+                Node<T> cur = head.Next;
+                while (cur.Next != null)
                 {
-                    Console.WriteLine("Укажите количество строк в массиве");
-                    n = Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("Укажите количество столбцов в массиве");
-                    m = Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("Укажите вероятность появления + в массиве (от 0 до 9)");
-                    r = Convert.ToInt32(Console.ReadLine());
-                    massive = mas(n, m, r);
-                    Console.WriteLine("Введите знак заполнения");
-                    z = Convert.ToChar(Console.ReadLine());
-                    Console.WriteLine("Введите координату х");
-                    x = Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("Введите координату y");
-                    y = Convert.ToInt32(Console.ReadLine());
-                    zaliv(x, y, m, n, massive, z);
-                    Show(massive, n);
-                    Console.WriteLine($"Кол-во плюсов: {count_plus}");
-                    Console.WriteLine($"Кол-во пропусков:{count_space}");
-                    Console.WriteLine($"Кол-во заполненных:{count_fill}");
-                    break;
+                    cur = cur.Next;
                 }
-                catch
+                cur.Next = node;
+            }
+            count++;
+        }
+
+        public void PushFront(T data)
+        {
+            Node<T> node = new Node<T>(data);
+
+            if (head.Next == null)
+            {
+                PushBack(data);
+            }
+            else
+            {
+                node.Next = head.Next;
+                head.Next = node;
+
+            }
+            count++;
+        }
+
+        public bool Remove(T data)
+        {
+            Node<T> current = head.Next;
+            Node<T> previous = null;
+
+            if (IsEmpty()) return false;
+
+            do
+            {
+                if (current.Data.Equals(data))
                 {
-                    Console.WriteLine("Неверно ввели знаечение");
+                    if (previous == null)
+                    {
+                        head.Next = current.Next;
+                    }
+                    else
+                    {
+                        previous.Next = current.Next;
+                    }
+                    count--;
+                    return true;
                 }
+                previous = current;
+                current = current.Next;
+
+            } while (current != null);
+
+            return false;
+        }
+
+        public void RemoveAt(int index)
+        {
+            if (index == 0)
+            {
+                this.PopFront();
+            }
+            else if (index == count - 1)
+            {
+                this.PopBack();
+            }
+            else
+            {
+                Node<T> current = head.Next;
+                Node<T> previous = null;
+                for (int i = 0; i < index; i++)
+                {
+                    previous = current;
+                    current = current.Next;
+                }
+                previous.Next = current.Next;
+                count--;
             }
         }
-        static char[] mas(int n, int m, int r)
+
+        public void PopFront()
         {
-            Random rnd = new Random();
-            char[] massive = new char[n * m];
-            for (int i = 0; i < massive.Length; i++)
+            head.Next = head.Next.Next;
+            count--;
+        }
+
+        public void Insert(int index, T data)
+        {
+
+            if (index >= count)
             {
-                if (r > rnd.Next(1, 10))
+                PushBack(data);
+            }
+            else
+            {
+                if (index == 0)
                 {
-                    massive[i] = '+';
-                    count_plus++;
+                    PushFront(data);
                 }
                 else
                 {
-                    massive[i] = ' ';
-                    count_space++;
-                }
-                Console.Write(massive[i] + " ");
-                if ((i + 1) % m == 0)
-                    Console.WriteLine();
-            }
-            return massive;
-        }
-        static void Show(char[] mas, int m)
-        {
-            for (int i = 0; i < mas.Length; i++)
-            {
-                Console.Write(mas[i] + " ");
-                if ((i + 1) % m == 0)
-                    Console.WriteLine();
-            }
-        }
-        static void zaliv(int x, int y, int n, int m, char[] mas, char z)
-        {
-            MyStack<(int, int)> stack = new MyStack<(int, int)>();
-            stack.Push((x, y));
-            while (stack.Length > 0)
-            {
-                (int X, int Y) = stack.Pop();
+                    Node<T> node = new Node<T>(data);
+                    Node<T> current = head.Next;
 
-                if (X >= 0 && Y >= 0 && X < m && Y < n && mas[Y * m + X] == ' ')
-                {
-                    mas[Y * m + X] = z;
-                    stack.Push((X - 1, Y));
-                    stack.Push((X + 1, Y));
-                    stack.Push((X, Y + 1));
-                    stack.Push((X, Y - 1));
-                    count_fill++;
+                    for (int i = 0; i < index; i++)
+                    {
+                        current = current.Next;
+                    }
+
+                    node.Next = current.Next;
+                    current.Next = node;
+                    ++count;
                 }
+            }
+        }
+
+
+        public int Count { get { return count; } }
+        public bool IsEmpty() { return count == 0; }
+        public void Clear()
+        {
+            head.Next = null;
+            count = 0;
+        }
+
+        public bool Contains(T data)
+        {
+            Node<T> current = head.Next;
+            if (current == null) return false;
+            for (int i = 0; i < count; i++)
+            {
+                if (current.Data.Equals(data))
+                    return true;
+                current = current.Next;
+            }
+            return false;
+        }
+
+
+        public T First() { return head.Next.Data; }
+
+        public T Last()
+        {
+            Node<T> current = head.Next;
+            for (int i = 0; i < count - 1; i++)
+            {
+                current = current.Next;
+            }
+            return current.Data;
+        }
+
+        public void PopBack()
+        {
+            Node<T> current = head.Next;
+            Node<T> previos = null;
+            if (count == 1)
+            {
+                head.Next = null;
+                count = 0;
+            }
+            else
+            {
+                while (current.Next != null)
+                {
+                    previos = current;
+                    current = current.Next;
+                }
+                previos.Next = null;
+                count--;
+            }
+        }
+
+        public int FindIndex(T data)
+        {
+            Node<T> current = head.Next;
+            int ind = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (current.Data.Equals(data))
+                {
+                    return ind;
+                }
+                current = current.Next;
+                ind++;
+            }
+            return -1;
+
+        }
+
+        public T this[int index]
+        {
+            get
+            {
+                Node<T> current = head.Next;
+                for (int i = 0; i < index; i++)
+                {
+                    current = current.Next;
+                }
+                return current.Data;
+            }
+            set
+            {
+                Node<T> current = head.Next;
+                for (int i = 0; i < index; i++)
+                {
+                    current = current.Next;
+                }
+                current.Data = value;
+            }
+        }
+
+        // реализация интерфейса IEnumerable
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)this).GetEnumerator();
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            Node<T> current = head.Next;
+            for (int i = 0; i < count; i++)
+            {
+
+                yield return current.Data;
+                current = current.Next;
             }
         }
     }
-    internal class MyStack<T>
+    interface ISLList<T>
     {
-        T[] array;
-        int count;
-        public MyStack()
-        {
-            array = new T[1];
-        }
-        public MyStack(int length)
-        {
-            array = new T[length];
-        }
-        public void Push(T item)
-        {
-            if (count >= array.Length)
-            {
-                Array.Resize(ref array, array.Length * 2);
-            }
-            array[count++] = item;
-        }
-        public T Pop()
-        {
-            if (count == 0)
-            {
-                throw new Exception("Stack empty");
-            }
-            T a = array[--count];
-            array[count] = default(T);
-            return a;
-        }
-        public T Top()
-        {
-            if (count == 0)
-            {
-                throw new Exception("Stack empty");
-            }
-            return array[count - 1];
-        }
-        public int Length
-        {
-            get { return count; }
-        }
+        void PushBack(T value); // добавляет элемент в конец списка;
+        void PushFront(T value); // добавляет элемент в начало списка;
+        void Insert(int index, T value); // добавляет элемент по индексу;
+        void PopBack(); // удаляет последний элемент в списке;
+        void PopFront(); // удаляет первый элемент в списке;
+        void RemoveAt(int index); // удаляет элемент в списке по указанному индексу;
+        T this[int index] { set; get; } // для записи/чтения элемента по указанному индексу;
+        int Count { get; } // возвращает количество элементов в~списке;
+        bool IsEmpty(); // отвечает на вопрос пустой ли список;
+        void Clear(); // очищает список, удаляет все узлы;
+        T First(); // возвращает первый элемент списка;
+        T Last(); // возвращает последний элемент списка.
     }
 }
