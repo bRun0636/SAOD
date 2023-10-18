@@ -1,0 +1,101 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Drawing;
+using System.Threading.Tasks;
+
+namespace ConsoleApp2
+{
+    internal class Program
+    {
+        static int count_plus, count_fill, count_space;
+        static void Main(string[] args)
+        {
+            int n, m, r, x, y;
+            char z;
+            char[] massive;
+
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("Укажите количество строк в массиве");
+                    n = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Укажите количество столбцов в массиве");
+                    m = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Укажите вероятность появления + в массиве (от 0 до 9)");
+                    r = Convert.ToInt32(Console.ReadLine());
+                    massive = mas(n, m, r);
+                    Console.WriteLine("Введите знак заполнения");
+                    z = Convert.ToChar(Console.ReadLine());
+                    Console.WriteLine("Введите координату х");
+                    x = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите координату y");
+                    y = Convert.ToInt32(Console.ReadLine());
+                    zaliv(x, y, m, n, massive, z);
+                    Show(massive, n);
+                    Console.WriteLine($"Кол-во плюсов: {count_plus}");
+                    Console.WriteLine($"Кол-во пропусков:{count_space}");
+                    Console.WriteLine($"Кол-во заполненных:{count_fill}");
+                    break;
+                }
+                catch
+                {
+                    Console.WriteLine("Неверно ввели знаечение");
+                }
+
+            }
+        }
+
+        static char[] mas(int n, int m, int r)
+        {
+            Random rnd = new Random();
+            char[] massive = new char[n * m];
+            for (int i = 0; i < massive.Length; i++)
+            {
+                if (r > rnd.Next(1, 10))
+                {
+                    massive[i] = '+';
+                    count_plus++;
+                }
+                else
+                {
+                    massive[i] = ' ';
+                    count_space++;
+                }
+                Console.Write(massive[i] + " ");
+                if ((i + 1) % m == 0)
+                    Console.WriteLine();
+            }
+            return massive;
+        }
+        static void zaliv(int x, int y, int m, int n, char[] massive, char z)
+        {
+            Queue<(int, int)> queue = new Queue<(int, int)>();
+            queue.Enqueue((x, y));
+            while (queue.Count > 0)
+            {
+                (int X, int Y) = queue.Dequeue();
+                if (X >= 0 && Y >= 0 && X < m && Y < n && massive[Y * m + X] == ' ')
+                {
+                    massive[Y * m + X] = z;
+                    queue.Enqueue((X - 1, Y));
+                    queue.Enqueue((X + 1, Y));
+                    queue.Enqueue((X, Y - 1));
+                    queue.Enqueue((X, Y + 1));
+                    count_fill++;
+                }
+            }
+        }
+        static void Show(char[] mas, int m)
+        {
+            for (int i = 0; i < mas.Length; i++)
+            {
+                Console.Write(mas[i] + " ");
+                if ((i + 1) % m == 0)
+                    Console.WriteLine();
+            }
+        }
+    }
+}
