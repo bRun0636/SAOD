@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,34 +7,34 @@ using System.Threading.Tasks;
 
 namespace ListTask
 {
-    public class List<T> : IEnumerable
+    public class MyList<T> : IEnumerable
     {
-        private int capacity;
+        private int copacity;
         private int size;
         private T[] array;
 
-        public List() 
+        public MyList()
         {
             size = 0;
-            capacity = 1;
+            copacity = 1;
             array = new T[1];
         }
-        public List(int lenght)
+        public MyList(int lenght)
         {
             size = 0;
-            capacity = lenght;
+            copacity = lenght;
             array = new T[lenght];
         }
         public void Add(T item)
         {
-            if (size >= capacity)
+            if (size >= copacity)
             {
-                Array.Resize(ref array, capacity*2)
+                Array.Resize(ref array, copacity * 2);
             }
             array[size++] = item;
         }
 
-        public void Foreach(Action<int> action)
+        public void Foreach(Action<T> action)
         {
             for (int i = 0; i < size; i++)
             {
@@ -57,23 +57,23 @@ namespace ListTask
             return -1;
         }
 
-        public T Find(int index) //???
+        public T Find(int index)
         {
             return array[index];
         }
 
         public void Insert(int index, T item)
         {
-            if (index<capacity)
+            if (index < copacity)
             {
-                for (int i = copacity-1; i > indx; i--)
+                for (int i = copacity - 1; i > index; i--)
                 {
-                    array[i] = array[i-1];
+                    array[i] = array[i - 1];
                 }
             }
             else
             {
-                Array.Resize(ref array, copacity*2);
+                Array.Resize(ref array, copacity * 2);
             }
             array[index] = item;
 
@@ -97,7 +97,7 @@ namespace ListTask
     {
         public static void Main()
         {
-            var lst = new List();
+            MyList<int> lst = new MyList<int>();
             lst.Add(1);
             lst.Add(2);
             lst.Add(3);
