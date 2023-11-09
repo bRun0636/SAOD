@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.Schema;
 
 namespace sem6
 {
@@ -19,6 +22,7 @@ namespace sem6
             bt.Insert(5);
             bt.Insert(6);
             Console.WriteLine(bt.ToString());
+            Console.WriteLine(bt.GetHeight(bt.root));
             Console.WriteLine("----------------------");
             bt.root = bt.right_rotation(bt.root);
             Console.WriteLine(bt.ToString());
@@ -32,7 +36,7 @@ namespace sem6
         private int data;
         private TreeNode left;
         private TreeNode right;
-
+        
         public int Data
         { get { return data; } set { data = value; } }
 
@@ -50,13 +54,18 @@ namespace sem6
     public class BinaryTree
     {
         public TreeNode root;
-
+        int count;
         public void Insert(int d)
         {
             if (root == null)
+            {
                 root = new TreeNode(d);
+                count++;
+            }
             else
                 insert(root, d);
+            
+
         }
 
         private void insert(TreeNode n, int d)
@@ -64,16 +73,26 @@ namespace sem6
             if (d < n.Data)
             {
                 if (n.Left == null)
+                {
                     n.Left = new TreeNode(d);
+                }
                 else
+                {
                     insert(n.Left, d);
+
+                }
             }
             else
             {
                 if (n.Right == null)
+                {
                     n.Right = new TreeNode(d);
+                }
                 else
+                {
                     insert(n.Right, d);
+                    
+                }
             }
         }
 
@@ -124,9 +143,20 @@ namespace sem6
             var res = ToStringHelper(root).Value;
             return res;
         }
+        public int GetHeight(TreeNode node)
+        {
+            if (node == null)
+                return 0;
+            else
+                return Max(GetHeight(node.Left), GetHeight(node.Right)) + 1;
+        }
 
-
-
+        public int Max(int n, int m)
+        {
+            if (n > m)
+                return n;
+            else return m;
+        }
 
         public TreeNode right_rotation(TreeNode Root)
         {
